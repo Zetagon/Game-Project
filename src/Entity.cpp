@@ -1,6 +1,7 @@
 #include "Entity.h"
 #include <cmath>
 #include <CApp.h>
+#include "log.h"
 Entity::Entity(SDL_Rect pRect, int pmass,const std::shared_ptr<Timer>& T, SDL_Renderer* renderer )
 {
     //ctor
@@ -54,12 +55,13 @@ void Entity::CheckCollisionWithBlock(Block block)
 
         //Save velocity, in case leftDistance is not the minimum distance
         double tempVelocityX = velocityX;
+        double tempVelocityY = velocityY;
 
 
         //Set minDistance to leftDistance, if this is true, none of the conditions below will be true
         penetrationVector = {-leftDistance - 1, 0};
         int minDistance = std::abs(leftDistance);
-        velocityX = 0;
+        velocityX *= -0.9;
         Direction direction = Direction::left;
         if(std::abs(rightDistance) < minDistance)
         {
@@ -73,7 +75,7 @@ void Entity::CheckCollisionWithBlock(Block block)
             minDistance = std::abs(topDistance);
             penetrationVector = {0, -topDistance + 1};
             velocityX = tempVelocityX;
-            velocityY = 0;
+            velocityY = -0.9 * tempVelocityY;
             direction = Direction::up;
         }
         if(std::abs(bottomDistance) < minDistance)
@@ -81,7 +83,7 @@ void Entity::CheckCollisionWithBlock(Block block)
             minDistance = std::abs(bottomDistance);
             penetrationVector = {0, -bottomDistance - 1};
             velocityX = tempVelocityX;
-            velocityY = 0;
+            velocityY = -0.9 * tempVelocityY;
             direction = Direction::down;
         }
 
@@ -105,6 +107,7 @@ void Entity::CheckCollisionWithBlock(Block block)
 
 // std::cout << isOnGround << "\n";
 }
+
 bool Entity::CheckCollision(const SDL_Rect& pRect)
 {
     SDL_Rect tempRect;
@@ -131,15 +134,15 @@ bool Entity::CheckCollision(const SDL_Rect& pRect, SDL_Rect& returnMinkowski)
                             hurtbox.w + rect.w,
                             hurtbox.h + rect.h};
     returnMinkowski = minkowskiDiff;
-
-    SDL_Rect temp = minkowskiDiff;//not needed
-    temp.x += 100;//not needed
-    temp.y += 100;//not needed
-    SDL_Rect zero = { 100, 100, 10 , 10};//not needed
-    SDL_SetRenderDrawColor(CApp_Renderer, 0,0,255,125);//not needed
-    SDL_RenderDrawRect(CApp_Renderer, &temp);//not needed
-    SDL_RenderDrawRect(CApp_Renderer, &zero);//not needed
-    SDL_RenderPresent(CApp_Renderer);//not needed
+//    Debugging
+//    SDL_Rect temp = minkowskiDiff;//not needed
+//    temp.x += 100;//not needed
+//    temp.y += 100;//not needed
+//    SDL_Rect zero = { 100, 100, 10 , 10};//not needed
+//    SDL_SetRenderDrawColor(CApp_Renderer, 0,0,255,125);//not needed
+//    SDL_RenderDrawRect(CApp_Renderer, &temp);//not needed
+//    SDL_RenderDrawRect(CApp_Renderer, &zero);//not needed
+//    SDL_RenderPresent(CApp_Renderer);//not needed
     if(!(minkowskiDiff.x > 0||
        minkowskiDiff.x + minkowskiDiff.w < 0||
        minkowskiDiff.y > 0||
@@ -154,6 +157,7 @@ bool Entity::CheckCollision(const SDL_Rect& pRect, SDL_Rect& returnMinkowski)
        }
 }
 
+
 /** \brief Applies a force on this entity
  *
  * \param newton How much force to be put on this entity.
@@ -163,14 +167,16 @@ bool Entity::CheckCollision(const SDL_Rect& pRect, SDL_Rect& returnMinkowski)
  */
 void Entity::ApplyForce(double newton, double radians)
 {
-    accX = accX + cos(radians) * newton / mass;
+    accX = accX + cos(radians) * newton/ mass;
     accY = accY + sin(radians) * newton / mass;
+//    FILE_LOG(logWARNING) << "ApplyForce()\n";
+//    FILE_LOG(logWARNING) << "accY " << accY << "\n";
+//    FILE_LOG(logWARNING) << "velocityY " << velocityY << "\n";
 }
 
 void Entity::ApplyGravity()
 {
     ApplyForce(gravitationalAcceleration * mass, -0.5 * M_PI);
-//    std::cout << "positionY " << y << "\n";
 }
 
 /** \brief Update velocity by adding acceleration
@@ -180,6 +186,8 @@ void Entity::ApplyGravity()
  */
 void Entity::UppdateVelocity()
 {
+    double time = timer->GettimeSince();
+
     velocityX += accX * timer->GettimeSince();
     velocityY += accY * timer->GettimeSince();
     accX = 0;

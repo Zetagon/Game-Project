@@ -6,8 +6,17 @@
 
 void CApp::OnLoop()
 {
-//    tempEntity->ApplyForce(1,0);
+
     tempEntity->ApplyGravity();
+//    if(!(tempEntity->GetisOnGround()))
+//    {
+//        tempEntity->SetvelocityX(tempEntity->GetvelocityX() * 1);
+//    }
+//    else
+//    {
+//
+//        tempEntity->SetvelocityX(tempEntity->GetvelocityX() * 0);
+//    }
     tempEntity->Uppdate();
     for(unsigned int i = 0; i < blockV.size(); i++)
     {

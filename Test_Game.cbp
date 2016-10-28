@@ -39,9 +39,11 @@
 		</Linker>
 		<Unit filename="include/Block.h" />
 		<Unit filename="include/CApp.h" />
+		<Unit filename="include/Direction.h" />
 		<Unit filename="include/Entity.h" />
 		<Unit filename="include/Public_functions.h" />
 		<Unit filename="include/Timer.h" />
+		<Unit filename="include/log.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/Block.cpp" />
 		<Unit filename="src/CApp.cpp" />

@@ -3,7 +3,7 @@
 Timer::Timer()
 {
     //ctor
-    prevSysTime = 0;
+    prevSysTime = SDL_GetTicks();
     timeSince = 0;
 }
 

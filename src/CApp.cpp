@@ -23,10 +23,10 @@ void CApp::Start()
     running = true;
     while(running)
     {
-        timer->start();
         OnEvent();
         OnLoop();
         OnRender();
+        timer->start();
     }
     OnCleanup();
 }
